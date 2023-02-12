@@ -1,5 +1,8 @@
 # python_custom_widgets_tk
 
+> Demo screen
+![demo](/src/screen.png)
+
 > Requirements
 ```
 python3
