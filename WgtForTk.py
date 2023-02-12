@@ -3,370 +3,10 @@ from tkinter import *
 import os
 from PIL import ImageTk, Image
 
-
-class Settings():
-    def __init__(self):
-        self.names_commands_btn = [
-            ['Menu', 'self.init_menu_page'],
-            ['Profile', 'self.init_profile_page'],
-            ['Photo', 'self.init_photo_page'],
-            ['History', 'self.init_history_page'],
-            ['Apps', 'self.init_apps_page'],
-            ['About', 'self.init_about_page'],
-            ['Exit', 'self.init_exit_from_app']
-        ]
-        self.color_frame_root = '#9AB9FF'
-        self.color_frame_page = '#D86CFF'
-        self.color_frame_control = '#96FF8F'
-        self.mode_fill_btn = 'both'
-
-        self.mode_expand_btn = 'yes'
-        self.mode_side_btn = 'left'
-        self.division_display_size = 350
-        self.size_padding = 3
-
-
-class Container():
-    def __init__(self, class_app):
-        self.app = class_app
-        self.settings = Settings()
-        self.files = OpennerLoaderPhotos()
-        self.files_py = OpennerLoaderFilesPython()
-        self.files = self.files.files
-        self.array_btns = []
-        self.array_titles = []
-        self.init_frm()
-        self.init_generated_btn()
-        self.func_for_all_page(self.frame_frame, 'Welcome')
-
-    def init_frm(self):
-        self.rootfr = Frame(self.app.root, bg=self.settings.color_frame_root)
-        self.rootfr.pack(fill=self.settings.mode_fill_btn, expand=self.settings.mode_expand_btn)
-        self.frame_frame = Frame(self.rootfr, bg=self.settings.color_frame_page)
-        self.frame_frame.pack(fill=self.settings.mode_fill_btn, expand=self.settings.mode_expand_btn,
-                              ipady=self.settings.division_display_size)
-        self.frame_control = Frame(self.rootfr, bg=self.settings.color_frame_control)
-        self.frame_control.pack(fill=self.settings.mode_fill_btn, expand=self.settings.mode_expand_btn,
-                                pady=self.settings.size_padding)
-
-    def init_generated_btn(self):
-        for ctrl in self.settings.names_commands_btn:
-            # print(ctrl)
-            self.btn = Button(self.frame_control, text=ctrl[0], command=eval(ctrl[1]))
-            self.btn.pack(fill=self.settings.mode_fill_btn, expand=self.settings.mode_expand_btn, side='left')
-            self.array_btns.append(self.btn)
-
-    def clear_page(self):
-        for child in self.frame_frame.winfo_children():
-            child.destroy()
-        self.app.root.update()
-
-    def func_for_all_page(self, page, text):
-        self.init_generated_title_page(page, text)
-
-    def init_generated_title_page(self, page, text):
-        self.lt = Label(page, text=text)
-        self.lt.pack(fill='x', side='top')
-        self.array_titles.append(self.lt)
-
-    def init_menu_page(self):
-        self.clear_page()
-        self.menu = Frame(self.frame_frame, bg='red')
-        self.menu.pack(fill=self.settings.mode_fill_btn, expand=self.settings.mode_expand_btn)
-        self.func_for_all_page(self.menu, 'Menu')
-
-    def init_profile_page(self):
-        self.clear_page()
-        self.profile = Frame(self.frame_frame, bg='green')
-        self.profile.pack(fill=self.settings.mode_fill_btn, expand=self.settings.mode_expand_btn)
-        self.func_for_all_page(self.profile, 'Profile')
-
-    def init_photo_page(self):
-        self.clear_page()
-        self.photo = Frame(self.frame_frame, bg='violet')
-        self.photo.pack(fill=self.settings.mode_fill_btn, expand=self.settings.mode_expand_btn)
-        self.func_for_all_page(self.photo, 'Photo')
-
-        self.panel_photo = ScrollPanelWidgetHorizontal(self.photo, 25, 25, 1200, 700, 'cyan')
-        x = 0
-        for photo in self.files:
-            if photo.endswith('.jpg'):
-                # print(photo)
-                self.panel_photo.append_image(x, 0, 700, r'C:\Users\YURIJ\Desktop\PHOTOS\\' + photo,
-                                              mode_resize=True, size=2)
-                x += 1000
-
-
-    def init_history_page(self):
-        self.clear_page()
-        self.history = Frame(self.frame_frame, bg='cyan')
-        self.history.pack(fill=self.settings.mode_fill_btn, expand=self.settings.mode_expand_btn)
-        self.func_for_all_page(self.history, 'History')
-
-    def find_fpy(self):
-        pass
-
-    def generated_list_files_py(self):
-        self.ar_fpy = []
-        ph = r'C:\Users\YURIJ\PycharmProjects'
-        list_dirs = os.listdir(ph)
-        for pp in list_dirs:
-            fpy = os.listdir(ph + '\\' + pp)
-            for fp in fpy:
-                if fp.endswith('.py'):
-                    self.ar_fpy.append(ph + '\\' + pp + '\\' + fp)
-        return (self.ar_fpy)
-
-
-    def init_apps_page(self):
-        self.clear_page()
-        self.apps = Frame(self.frame_frame, bg='yellow')
-        self.apps.pack(fill=self.settings.mode_fill_btn, expand=self.settings.mode_expand_btn)
-        self.func_for_all_page(self.apps, 'Apps')
-        self.panel_apps = ScrollPanelWidgetVertical(self.apps, 0, 20, 900, 710, '#CFA9FF')
-        self.t_info_code = Text(self.apps)
-        self.t_info_code.place(x=900, y=20, width=470, height=710)
-        y = 0
-        count_bt = 0
-        list_files_py = self.generated_list_files_py()
-        for fpy in list_files_py:
-            # print(f" comms for btn     >>   {fpy}")
-            self.panel_apps.append_btn(str(fpy), 0, y, 25, f='Arial 15')
-            self.panel_apps.set_coms_btn(count_bt, self.coms_bt_apps, args=fpy)
-            count_bt += 1
-            y += 25
-
-    def coms_bt_apps(self, path):
-        self.t_info_code.delete(0.0, END)
-        f = open(path, 'r', encoding='utf8')
-        ff = f.read()
-        self.t_info_code.insert(0.0, ff)
-        f.close()
-        # print(">>>>>>>>>>>>>>>>>>>>>>>>>", path)
-        ph = path.split('\\')
-        ph.pop(-1)
-        np = ''
-        for ind in ph:
-            np += ind + '\\'
-        os.chdir(np)
-        os.system(f'python39 {path}')
-
-    def init_about_page(self):
-        self.clear_page()
-        self.about = Frame(self.frame_frame, bg='blue')
-        self.about.pack(fill=self.settings.mode_fill_btn, expand=self.settings.mode_expand_btn)
-        self.func_for_all_page(self.about, 'About')
-
-    def init_exit_from_app(self):
-        # print('esc')
-        res = messagebox.askyesno('EXIT', 'YOU DO EXIT?')
-        if res:
-            sys.exit()
-
-
-class ContainerRoot():
-    def __init__(self):
-        self.array_pages = []
-    def set_app_class(self, classes):
-        self.app = classes
-    def set_settings_class(self,classes):
-        self.settings = classes
-
-
-    def init_generated_btn(self, array_names_coms_btn):
-        for ctrl in array_names_coms_btn:
-            # print(ctrl)
-            self.btn = Button(self.frame_control, text=ctrl[0], command=eval(ctrl[1]))
-            self.btn.pack(fill=self.settings.mode_fill_btn, expand=self.settings.mode_expand_btn, side='left')
-            self.array_btns.append(self.btn)
-
-    def clear_page(self):
-        try:
-            for child in self.frame_frame.winfo_children():
-                child.destroy()
-            self.app.root.update()
-        except AttributeError as exc:
-            print(exc)
-
-    def func_for_all_page(self, function_user=None):
-        if function_user != None:
-            function_user()
-
-    def init_generated_title_page(self, page, text):
-        self.lt = Label(page, text=text)
-        self.lt.pack(fill='x', side='top')
-
-    def init_page(self,master):
-        self.clear_page()
-        page = Frame(master, bg=self.settings.color_frame_page)
-        page.pack(fill=self.settings.mode_fill_btn, expand=self.settings.mode_expand_btn)
-        return page
-
-
-    def init_exit_from_app(self):
-        # print('esc')
-        res = messagebox.askyesno('EXIT', 'YOU DO EXIT?')
-        if res:
-            sys.exit()
-
-
-class OpennerLoaderPhotos():
-    def __init__(self):
-        self.files = os.listdir(r'C:\Users\YURIJ\Desktop\PHOTOS')
-        # print(self.files)
-
-
-class OpennerLoaderFilesPython():
-    def __init__(self):
-        self.files = os.listdir(r'C:\Users\YURIJ')
-        # print(self.files)
-
-
-class ScrollPanelWidgetVertical():
-    def __init__(self, master, x, y, w, h, color):
-        self.master, self.x, self.y, self.w, self.h = master, x, y, w, h
-        self.color = color
-        self.ar_imgs = []
-        self.array_btn = []
-        self.array_lbl = []
-        self.array_btn_img = []
-        self.frame = Frame(self.master, bg=self.color)
-        self.frame.place(x=self.x,
-                         y=self.y,
-                         width=self.w,
-                         height=self.h)
-        self.canvas = Canvas(self.frame, bg='green', scrollregion=(0, 0, 1000, 1000))
-        self.canvas.place(x=0,
-                          y=0,
-                          width=self.w - 15,
-                          height=self.h)
-
-        self.scroll = Scrollbar(self.frame, orient='v')
-        self.scroll.place(x=self.w - 15,
-                          y=0, width=15, height=self.h)
-
-        self.scroll.config(command=self.canvas.yview)
-        self.canvas.config(yscrollcommand=self.scroll.set)
-
-    def get_frame(self):
-        return self.frame
-
-    def get_canvas(self):
-        return self.canvas
-
-    def get_scroll(self):
-        return self.scroll
-
-    def set_coms_btn(self, num_btn, com, args):
-        self.array_btn[num_btn].configure(command=lambda: com(args))
-
-    def append_btn(self, text, x, y, h, com=eval('1+1'), f='Arial 20'):
-        w = self.w - 15
-        b = Button(self.canvas, text=text, font=f, command=com)
-        # print(x + w / 2, y + h / 2, f"x + w / 2, y + h / 2")
-        self.array_btn.append(b)
-        self.wgt = self.canvas.create_window((x + w / 2, y + h / 2), width=w, height=h, window=b)
-        self.set_region_scroll(1000, y + h)
-        return b
-
-    def append_label(self, text, x, y, h, f='Arial 20'):
-        w = self.w - 15
-        b = Label(self.canvas, text=text, font=f)
-        self.array_lbl.append(b)
-        self.wgt = self.canvas.create_window((x + w / 2, y + h / 2), width=w, height=h, window=b)
-        self.set_region_scroll(1000, y + h)
-        return b
-
-    def append_image(self, x, y, h, image_path, com=eval('1+1')):
-        w = self.w - 15
-        self.img = PhotoImage(file=image_path)
-        self.ar_imgs.append(self.img)
-        self.b = Button(self.canvas, image=self.img, command=com)
-        self.array_btn_img.append(self.b)
-        # print(x + w / 2, y + h / 2, f"x + w / 2, y + h / 2", f'x {x},  y {y},  h  {h}')
-        self.wgt = self.canvas.create_window((x + w / 2, y + h / 2), width=w, height=h, window=self.b)
-        self.set_region_scroll(y + h, 1000)
-        return self.wgt
-
-    def set_region_scroll(self, x, y):
-        self.canvas.configure(scrollregion=(0, 0, x, y))
-
-
-class ScrollPanelWidgetHorizontal():
-    def __init__(self, master, x, y, w, h, color):
-        self.master, self.x, self.y, self.w, self.h = master, x, y, w, h
-        self.ar_imgs = []
-        self.array_lbl = []
-        self.array_btn = []
-        self.array_img_btn = []
-        self.color = color
-        self.frame = Frame(self.master, bg=self.color)
-        self.frame.place(x=self.x,
-                         y=self.y,
-                         width=self.w,
-                         height=self.h)
-        self.canvas = Canvas(self.frame, bg='orange', scrollregion=(0, 0, 1000, 1000))
-        self.canvas.place(x=0,
-                          y=0,
-                          width=self.w,
-                          height=self.h - 15)
-
-        self.scroll = Scrollbar(self.frame, orient='h')
-        self.scroll.place(x=0, y=self.h - 15, width=self.w, height=15)
-
-        self.scroll.config(command=self.canvas.xview)
-        self.canvas.config(xscrollcommand=self.scroll.set)
-
-    def get_frame(self):
-        return self.frame
-
-    def get_canvas(self):
-        return self.canvas
-
-    def get_scroll(self):
-        return self.scroll
-
-    def set_coms_btn(self, num_btn, com, args):
-        self.array_btn[num_btn].configure(command=lambda: com(args))
-
-    def set_coms_btn_img(self, num_btn, com, args):
-        self.array_img_btn[num_btn].configure(command=lambda: com(args))
-
-    def append_btn(self, text, x, y, w, com=eval('1+1'), f='Arial 20'):
-        h = self.h - 15
-        b = Button(self.canvas, text=text, font=f, command=com)
-        # print(x + w / 2, y + h / 2, f"x + w / 2, y + h / 2")
-        self.array_btn.append(b)
-        self.wgt = self.canvas.create_window((x + w / 2, y + h / 2), width=w, height=h, window=b)
-        self.set_region_scroll(x + w, 1000)
-        return b
-
-    def append_label(self, text, x, y, w, f='Arial 20'):
-        h = self.h - 15
-        b = Label(self.canvas, text=text, font=f)
-        self.array_lbl.append(b)
-        self.wgt = self.canvas.create_window((x + w / 2, y + h / 2), width=w, height=h, window=b)
-        self.set_region_scroll(x + w, 1000)
-        return b
-
-    def append_image(self, x, y, w, image_path, com=eval('1+1'), mode_resize=False, size=2):
-        h = self.h - 15
-        self.image = Image.open(image_path)
-        if mode_resize:
-            width, height = self.image.size
-            # print(width,height)
-            self.image = self.image.resize((int(width / size), int(height / size)))
-        self.img = ImageTk.PhotoImage(self.image)
-        # self.img = PhotoImage(file=image_path)
-        self.ar_imgs.append(self.img)
-        self.b = Button(self.canvas, image=self.img, command=com)
-        self.array_img_btn.append(self.b)
-        self.wgt = self.canvas.create_window((x + w / 2, y + h / 2), width=w, height=h, window=self.b)
-        self.set_region_scroll(x + w, 1000)
-        return self.wgt
-
-    def set_region_scroll(self, x, y):
-        self.canvas.configure(scrollregion=(0, 0, x, y))
+IMG_SRC_1 = 'src/im1.png'
+IMG_SRC_2 = 'src/im2.png'
+IMG_SRC_3 = 'src/im3.png'
+THEME_RELIEF = "groove"
 
 
 class WgtLabel():
@@ -374,8 +14,8 @@ class WgtLabel():
 		pass
 
 	def create(self, win, text1, text2, x, y, w=200, h=48, font_size=20):
-		lb = Label(win, text=text1, relief='groove', bd=3, font='consolas ' + str(font_size))
-		lb2 = Label(win, text=text2, relief='groove', bd=3, font='consolas ' + str(font_size))
+		lb = Label(win, text=text1, relief=THEME_RELIEF, bd=3, font='consolas ' + str(font_size))
+		lb2 = Label(win, text=text2, relief=THEME_RELIEF, bd=3, font='consolas ' + str(font_size))
 		lb.place(x=x, y=y, width=w, height=h)
 		lb2.place(x=x + w, y=y, width=w, height=h)
 		return lb2
@@ -386,8 +26,8 @@ class WgtEntry():
 		pass
 
 	def create(self, win, text1, x, y, w=200, h=48, bd=3):
-		lb = Label(win, text=text1, relief='groove', bd=bd, font='consolas 18')
-		lb2 = Entry(win, relief='groove', bd=bd, font='consolas 14')
+		lb = Label(win, text=text1, relief=THEME_RELIEF, bd=bd, font='consolas 18')
+		lb2 = Entry(win, relief=THEME_RELIEF, bd=bd, font='consolas 14')
 		lb.place(x=x, y=y, width=w, height=h)
 		lb2.place(x=x + w-4, y=y, width=w, height=h)
 		return lb2
@@ -398,8 +38,8 @@ class WgtFrameMarker():
 		pass
 
 	def create(self, win, text1, x, y, w, h):
-		f = Frame(win, relief='groove', bd=3)
-		lb = Label(win, text=text1, relief='groove', bd=3, font='consolas 12')
+		f = Frame(win, relief=THEME_RELIEF, bd=3)
+		lb = Label(win, text=text1, relief=THEME_RELIEF, bd=3, font='consolas 12')
 		f.place(x=x, y=y, width=w, height=h)
 		lb.place(x=x + 10, y=y - 15, width=w / 3 + w / 3, height=30)
 		return f, lb
@@ -410,7 +50,7 @@ class WgtFrame():
 		pass
 
 	def create(self, win, x, y, w, h):
-		f = Frame(win, relief='groove', bd=3)
+		f = Frame(win, relief=THEME_RELIEF, bd=3)
 		f.place(x=x, y=y, width=w, height=h)
 		return f
 
@@ -420,7 +60,7 @@ class WgtConsole():
 		pass
 
 	def create(self, win, x, y, w, h, size_font=12, text=''):
-		t = Text(win, relief='groove', bd=3, font='consolas ' + str(size_font))
+		t = Text(win, relief=THEME_RELIEF, bd=3, font='consolas ' + str(size_font))
 		t.place(x=x, y=y, width=w, height=h)
 		t.insert(0.0, text)
 		return t
@@ -431,7 +71,7 @@ class WgtButton():
 		pass
 
 	def create(self, win, t, x, y, w=120, h=50, com=None):
-		b = Button(win, text=t, relief='groove', bd=3, font='consolas 13', command=com)
+		b = Button(win, text=t, relief=THEME_RELIEF, bd=3, font='consolas 13', command=com)
 		b.place(x=x, y=y, width=w - 3, height=h)
 		return b
 
@@ -470,10 +110,10 @@ class WgtButtonPickCheck():
 
 	def __draw__(self):
 		if self.result_bool == True:
-			self.pick = Canvas(self.fr, bg=self.color_on, bd=2, relief='groove')
+			self.pick = Canvas(self.fr, bg=self.color_on, bd=2, relief=THEME_RELIEF)
 			self.pick.place(x=self.w / 2, y=3, width=self.w / 2, height=self.h - 3)
 		elif self.result_bool == False:
-			self.pick = Canvas(self.fr, bg=self.color_off, bd=2, relief='groove')
+			self.pick = Canvas(self.fr, bg=self.color_off, bd=2, relief=THEME_RELIEF)
 			self.pick.place(x=3, y=3, width=self.w / 2, height=self.h - 3)
 
 	def create(self, win, x, y, w=120, h=50, color_on='white', color_off='white'):
@@ -483,9 +123,9 @@ class WgtButtonPickCheck():
 		self.h = h
 		self.x = x
 		self.y = y
-		self.fr = Canvas(win, bd=2, relief='groove')
+		self.fr = Canvas(win, bd=2, relief=THEME_RELIEF)
 		self.fr.place(x=x, y=y, width=w + 4, height=h + 4)
-		self.pick = Canvas(self.fr, bg=self.color_off, bd=2, relief='groove')
+		self.pick = Canvas(self.fr, bg=self.color_off, bd=2, relief=THEME_RELIEF)
 		self.pick.place(x=3, y=3, width=w / 2, height=h - 3)
 		self.fr.bind("<Button-1>", self.com)
 		return self.fr
@@ -506,11 +146,11 @@ class WgtLoaderBarMove():
 		self.h = h
 		self.x = x
 		self.y = y
-		self.fr = Canvas(win, bd=2, bg=color_scale, relief='groove')
+		self.fr = Canvas(win, bd=2, bg=color_scale, relief=THEME_RELIEF)
 		self.fr.place(x=x, y=y, width=w + 4, height=h + 4)
 		if percent > w:
 			return self.fr
-		self.percent_indicate = Canvas(self.fr, bg=self.color_signal, bd=0, relief='groove')
+		self.percent_indicate = Canvas(self.fr, bg=self.color_signal, bd=0, relief=THEME_RELIEF)
 		self.percent_indicate.place(x=1 * percent, y=3, width=10, height=h - 3)
 		return self.fr
 
@@ -530,7 +170,7 @@ class WgtScrollPanelV():
 		self.h = h
 		self.x = x
 		self.y = y
-		self.fr = Canvas(win, bd=5, bg=color_bg, relief='groove')
+		self.fr = Canvas(win, bd=5, bg=color_bg, relief=THEME_RELIEF)
 		self.fr.place(x=x, y=y, width=w + 4, height=h + 4)
 		self.fr.bind_all("<MouseWheel>", self.command_up)
 		return self.fr
@@ -586,7 +226,7 @@ class WgtScrollPanelH():
 		self.h = h
 		self.x = x
 		self.y = y
-		self.fr = Canvas(win, bd=5, bg=color_bg, relief='groove')
+		self.fr = Canvas(win, bd=5, bg=color_bg, relief=THEME_RELIEF)
 		self.fr.place(x=x, y=y, width=w + 4, height=h + 4)
 		self.fr.bind_all("<MouseWheel>", self.command_up)
 		return self.fr
@@ -631,11 +271,11 @@ class WgtLoaderBarFill():
 		self.h = h
 		self.x = x
 		self.y = y
-		self.fr = Canvas(win, bd=2, bg=color_scale, relief='groove')
+		self.fr = Canvas(win, bd=2, bg=color_scale, relief=THEME_RELIEF)
 		self.fr.place(x=x, y=y, width=w + 4, height=h + 4)
 		if percent > w:
 			return self.fr
-		self.percent_indicate = Canvas(self.fr, bg=self.color_signal, bd=0, relief='groove')
+		self.percent_indicate = Canvas(self.fr, bg=self.color_signal, bd=0, relief=THEME_RELIEF)
 		self.percent_indicate.place(x=3, y=3, width=1 * percent, height=h - 3)
 		return self.fr, self.percent_indicate
 
@@ -653,7 +293,7 @@ class WgtLabelDateAndTimeNow:
 			t = t[0: t.index(".")]
 		except:
 			pass
-		l = Label(win, text=t, relief='groove', bd=3, font='consolas 13')
+		l = Label(win, text=t, relief=THEME_RELIEF, bd=3, font='consolas 13')
 		l.place(x=x, y=y, width=w - 3, height=h)
 		return l
 
@@ -668,7 +308,7 @@ class WgtLabelDateNow():
 			t = t[0: t.index(" ")]
 		except:
 			pass
-		l = Label(win, text=t, relief='groove', bd=3, font='consolas 13')
+		l = Label(win, text=t, relief=THEME_RELIEF, bd=3, font='consolas 13')
 		l.place(x=x, y=y, width=w - 3, height=h)
 		return l
 
@@ -683,7 +323,7 @@ class WgtLabelTimeNow():
 			t = t[t.index(" "): t.index(".")]
 		except:
 			t = t[t.index(" "):]
-		l = Label(win, text=t, relief='groove', bd=3, font='consolas 13')
+		l = Label(win, text=t, relief=THEME_RELIEF, bd=3, font='consolas 13')
 		l.place(x=x, y=y, width=w - 3, height=h)
 		return l
 
@@ -702,13 +342,13 @@ class WgtLabelTimeNowVertical():
 		t = t[t.index(":") + 1:]
 		t_m = t[:t.index(":")]
 		t_s = t[t.index(":") + 1:]
-		fr = Frame(win, bd=4, relief='groove')
+		fr = Frame(win, bd=4, relief=THEME_RELIEF)
 		fr.place(x=x, y=y, width=w, height=h + 10)
-		l_hour = Label(fr, text=t_h.strip(), relief='groove', bd=1, font='magneto ' + str(size_font))
+		l_hour = Label(fr, text=t_h.strip(), relief=THEME_RELIEF, bd=1, font='magneto ' + str(size_font))
 		l_hour.place(x=0, y=0, width=w - 10, height=h / 3)
-		l_min = Label(fr, text=t_m.strip(), relief='groove', bd=1, font='magneto ' + str(size_font))
+		l_min = Label(fr, text=t_m.strip(), relief=THEME_RELIEF, bd=1, font='magneto ' + str(size_font))
 		l_min.place(x=0, y=h / 3, width=w - 10, height=h / 3)
-		l_sec = Label(fr, text=t_s.strip(), relief='groove', bd=1, font='magneto ' + str(size_font))
+		l_sec = Label(fr, text=t_s.strip(), relief=THEME_RELIEF, bd=1, font='magneto ' + str(size_font))
 		l_sec.place(x=0, y=h / 3 + (h / 3), width=w - 10, height=h / 3)
 		return fr, l_hour, l_min, l_sec
 
@@ -720,7 +360,7 @@ class WgtDrawFromDict():
 	# example:
 	# ar = {'Desktop': ['movies', 1, 2, 3], 'Laptop': ['Python', 'javascript', 'PHP']}
 	def create(self, win, dict_ar, x, y, w, h, size=20):
-		cnv = Canvas(win, bd=2, relief='groove')
+		cnv = Canvas(win, bd=2, relief=THEME_RELIEF)
 		cnv.place(x=x, y=y, width=w, height=h)
 		count_key = 1
 		count_all = 0
@@ -767,7 +407,7 @@ class WgtStatisticBar():
 	def create(self, win, array_data_int, x, y, w=120, h=50,
 			   array_colors=['purple', 'violet', 'pink', 'red', 'orange', 'yellow', 'cyan']):
 		counter_color = -1
-		cnv = Canvas(win, relief='groove', bd=3)
+		cnv = Canvas(win, relief=THEME_RELIEF, bd=3)
 		cnv.place(x=x, y=y, width=w - 3, height=h)
 		xx = 0
 		run_one = True
@@ -795,7 +435,7 @@ class WgtStatisticBarUniversal():
 			   array_colors=['purple', 'violet', 'pink', 'red', 'orange', 'yellow', 'cyan']):
 		counter_color = -1
 		one_percept_in_px = int(w / 100)
-		cnv = Canvas(win, relief='groove', bd=3)
+		cnv = Canvas(win, relief=THEME_RELIEF, bd=3)
 		cnv.place(x=x, y=y, width=w - 3, height=h)
 		xx = 0
 		run_one = True
@@ -822,9 +462,9 @@ class WgtStatisticBarMarker():
 	def create(self, win, array_data_int, x, y, w=120, h=50, array_text=['text1', 'text2'],
 			   array_colors=['purple', 'violet', 'pink', 'red', 'orange', 'yellow', 'cyan']):
 		counter_color = 0
-		cnv = Canvas(win, relief='groove', bd=3)
+		cnv = Canvas(win, relief=THEME_RELIEF, bd=3)
 		cnv.place(x=x, y=y, width=w - 3, height=h)
-		cnv_text = Canvas(win, relief='groove', bd=3)
+		cnv_text = Canvas(win, relief=THEME_RELIEF, bd=3)
 		cnv_text.place(x=x, y=y + h - 3, width=w - 3, height=25 * len(array_text))
 		y_pos_rect = 10
 		y_pos_text = 10
@@ -861,9 +501,9 @@ class WgtStatisticBarMarkerUniversal():
 	def create(self, win, array_data_int, x, y, w=120, h=50, array_text=['text1', 'text2'],
 			   array_colors=['purple', 'violet', 'pink', 'red', 'orange', 'yellow', 'cyan']):
 		counter_color = 0
-		cnv = Canvas(win, relief='groove', bd=3)
+		cnv = Canvas(win, relief=THEME_RELIEF, bd=3)
 		cnv.place(x=x, y=y, width=w - 3, height=h)
-		cnv_text = Canvas(win, relief='groove', bd=3)
+		cnv_text = Canvas(win, relief=THEME_RELIEF, bd=3)
 		cnv_text.place(x=x, y=y + h - 3, width=w - 3, height=25 * len(array_text))
 		y_pos_rect = 10
 		y_pos_text = 10
@@ -902,7 +542,7 @@ class WgtCanvasAnimationImage():
 	#
 	def create(self, win, array_images, num_img, x, y, w, h):
 		global cnv, im
-		cnv = Canvas(win, relief='groove', bd=0, )
+		cnv = Canvas(win, relief=THEME_RELIEF, bd=0, )
 		cnv.place(x=x, y=y, width=w, height=h)
 		im = PhotoImage(file=array_images[num_img])
 		cnv.create_image((0, 0), image=im, anchor='nw')
@@ -913,7 +553,7 @@ class WgtGridRect():
 		pass
 
 	def create(self, win, x, y, w, h, col, row, arr_matrix, color_rect='white'):
-		cnv = Canvas(win, relief='groove', bd=3)
+		cnv = Canvas(win, relief=THEME_RELIEF, bd=3)
 		cnv.place(x=x, y=y, width=w * col + 5, height=h * row + 5)
 		xx, yy, xx2, yy2 = 0, 0, w, h
 		counter_loop_for = 0
@@ -935,7 +575,7 @@ class WgtGridRectColor():
 		pass
 
 	def create(self, win, x, y, w, h, col, row, arr_matrix, arr_colors=['red', 'green', 'blue', 'white']):
-		cnv = Canvas(win, relief='groove', bd=3)
+		cnv = Canvas(win, relief=THEME_RELIEF, bd=3)
 		cnv.place(x=x, y=y, width=w * col + 5, height=h * row + 5)
 		xx, yy, xx2, yy2 = 0, 0, w, h
 		counter_loop_for = 0
@@ -961,28 +601,6 @@ class WgtDrawNetPoints():
 		length_line = (x2 - x, y2 - y)
 		return length_line
 
-
-#
-# root = Tk()
-#
-# root.geometry("1400x700+-10+0")
-# cnv = Canvas(root, bg='black')
-# cnv.place(x=0, y=0, width=1400, height=700)
-# import random
-# import time
-# arl = []
-# for i in range(2):
-# 	x, y = random.randint(0, 1400), random.randint(0, 700)
-# 	l = cnv.create_oval((x, y, x + 15, y + 15), fill='white')
-# 	arl.append(l)
-#
-# while True:
-# 	for i in arl:
-# 		cnv.moveto(i,random.randint(0, 1400), random.randint(0, 700))
-# 		root.update()
-# 		time.sleep(0.3)
-#
-# root.mainloop()
 
 if __name__ == '__main__':
 	root = Tk()
@@ -1026,7 +644,7 @@ if __name__ == '__main__':
 
 
 	def test_8():
-		test8 = WgtButtonCustomUser().create(root, 10, 600, img='IMG_TK_WGT\\btn_normal.png')
+		test8 = WgtButtonCustomUser().create(root, 10, 600, img=IMG_SRC_1)
 
 
 	def test_9_10():
@@ -1045,6 +663,7 @@ if __name__ == '__main__':
 	def test_11():
 		test11 = WgtLabelDateAndTimeNow().create(root, 50, 80)
 		root.after(500, test_11)
+		return
 
 
 	def test_12():
@@ -1055,11 +674,13 @@ if __name__ == '__main__':
 		test13 = WgtLabelTimeNow().create(root, 630, 140)
 		root.update()
 		root.after(0, test_13)
+		return
 
 
 	def test_14():
 		test14 = WgtLabelTimeNowVertical().create(root, 250, 130)
 		root.after(500, test_14)
+		return
 
 
 	def test_15():
@@ -1081,7 +702,7 @@ if __name__ == '__main__':
 
 
 	def test_18():
-		ar_image_for_test_18 = ['IMG_TK_WGT\\im1.png', 'IMG_TK_WGT\\im2.png', 'IMG_TK_WGT\\im3.png']
+		ar_image_for_test_18 = [IMG_SRC_1,IMG_SRC_2,IMG_SRC_3]
 		global counter_for_test_18
 		if counter_for_test_18 < len(ar_image_for_test_18):
 			WgtCanvasAnimationImage().create(root, array_images=ar_image_for_test_18,
@@ -1092,6 +713,7 @@ if __name__ == '__main__':
 											 x=480, y=400, w=100, h=100, num_img=counter_for_test_18)
 		counter_for_test_18 += 1
 		root.after(500, test_18)
+		return
 
 
 	def test_19():
