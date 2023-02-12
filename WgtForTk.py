@@ -18,7 +18,7 @@ class WgtLabel():
 		lb2 = Label(win, text=text2, relief=THEME_RELIEF, bd=3, font='consolas ' + str(font_size))
 		lb.place(x=x, y=y, width=w, height=h)
 		lb2.place(x=x + w, y=y, width=w, height=h)
-		return lb2
+		return lb,lb2
 
 
 class WgtEntry():
@@ -30,7 +30,7 @@ class WgtEntry():
 		lb2 = Entry(win, relief=THEME_RELIEF, bd=bd, font='consolas 14')
 		lb.place(x=x, y=y, width=w, height=h)
 		lb2.place(x=x + w-4, y=y, width=w, height=h)
-		return lb2
+		return lb,lb2
 
 
 class WgtFrameMarker():
